@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habito/authentication/services/auth_service.dart';
+import 'package:habito/authentication/widgets/login_inputs.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
 import 'package:habito/themes/defaults.dart';
@@ -9,7 +11,6 @@ class SignIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double keyboard = MediaQuery.of(context).viewInsets.bottom;
-    bool incorrectCredentials = false;
 
     return Scaffold(
       appBar: AppBar(),
@@ -37,51 +38,7 @@ class SignIn extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: SizedBox(
-                  height: 25,
-                  child: Visibility(
-                    visible: incorrectCredentials,
-                    child: Text(
-                      "Incorrect email / password",
-                      style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? HabiColor.dangerLight
-                            : HabiColor.dangerDark,
-                        // color:  HabiColor.dangerDark,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const TextField(
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(hintText: "email"),
-            ),
-            const SizedBox(height: 10),
-            const TextField(
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(hintText: "password"),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: HabiMeasurements.paddingHorizontalXl,
-              ),
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  child: Text("login"),
-                ),
-              ),
-            ),
+            const LoginInputs(),
             Center(
               child: TextButton(
                 onPressed: () {},

@@ -6,6 +6,8 @@ class HabiTheme {
   HabiTheme._();
 
   static ThemeData lightTheme = ThemeData(
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: HabiColor.orange, circularTrackColor: HabiColor.white),
     appBarTheme: const AppBarTheme(
       toolbarTextStyle: TextStyle(
         color: HabiColor.blue,
@@ -55,6 +57,11 @@ class HabiTheme {
   );
 
   static ThemeData darkTheme = ThemeData(
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color: HabiColor.orange,
+      circularTrackColor: HabiColor.white,
+      refreshBackgroundColor: HabiColor.orange,
+    ),
     appBarTheme: const AppBarTheme(
       elevation: 0,
       toolbarTextStyle: TextStyle(
