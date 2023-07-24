@@ -13,7 +13,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: HabiTheme.darkTheme,
+      theme: HabiTheme.lightTheme,
+      darkTheme: HabiTheme.darkTheme,
+      themeMode: ThemeMode.system,
       home: const SignIn(),
     );
   }
@@ -39,22 +41,6 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-      // appBar:
-      // AppBar(
-      //   leading: TextButton(
-      //     onPressed: () {},
-      //     child: const Icon(
-      //       Icons.arrow_back_ios,
-      //     ),
-      //   ),
-      //   title: const Text("titulo"),
-      //   actions: [
-      //     TextButton(
-      //       onPressed: () {},
-      //       child: const Icon(Icons.add),
-      //     ),
-      //   ],
-      // ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -91,6 +77,5 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

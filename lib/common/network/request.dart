@@ -44,7 +44,7 @@ class RequestHabito {
         }
       }
 
-      _status = int.parse(decodedResponse['statusCode']);
+      _status = response.statusCode;
       _badRequest = _status >= 400;
 
       return decodedResponse;

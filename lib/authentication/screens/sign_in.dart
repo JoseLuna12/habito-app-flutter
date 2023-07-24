@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:habito/authentication/services/auth_service.dart';
-import 'package:habito/authentication/widgets/login_inputs.dart';
+import 'package:habito/authentication/screens/password_recovery.dart';
+import 'package:habito/authentication/screens/sign_up.dart';
+import 'package:habito/authentication/widgets/login_actions.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
 import 'package:habito/themes/defaults.dart';
@@ -38,10 +39,16 @@ class SignIn extends StatelessWidget {
                 ],
               ),
             ),
-            const LoginInputs(),
+            const LoginActions(),
             Center(
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const PasswordRecovery(),
+                    ),
+                  );
+                },
                 child: const Text(
                   "Forgot my password",
                   style: TextStyle(
@@ -59,7 +66,13 @@ class SignIn extends StatelessWidget {
                 ),
                 child: Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SignUp(),
+                        ),
+                      );
+                    },
                     child: const Text(
                       "Create Account",
                       style: TextStyle(

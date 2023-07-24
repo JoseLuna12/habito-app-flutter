@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:habito/authentication/services/auth_service.dart';
-import 'package:habito/constants/app_colors.dart';
+import 'package:habito/authentication/widgets/error_input_label.dart';
 import 'package:habito/constants/app_measurements.dart';
 
-class LoginInputs extends StatefulWidget {
-  const LoginInputs({Key? key}) : super(key: key);
+class LoginActions extends StatefulWidget {
+  const LoginActions({Key? key}) : super(key: key);
 
   @override
-  _LoginInputsState createState() => _LoginInputsState();
+  State<LoginActions> createState() => _LoginActionsState();
 }
 
-class _LoginInputsState extends State<LoginInputs> {
-  bool incorrectCredentials = false;
+class _LoginActionsState extends State<LoginActions> {
   bool _loading = false;
+  bool _incorrectCredentials = false;
   String _errorLoginMessage = "";
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,14 +29,11 @@ class _LoginInputsState extends State<LoginInputs> {
 
       final loggedUser = await loginNetwork(user, pass);
 
-      if (loggedUser.hasError) {
-        setState(() {
-          _errorLoginMessage = loggedUser.message!;
-          incorrectCredentials = true;
-        });
-      }
-
       setState(() {
+        if (loggedUser.hasError) {
+          _errorLoginMessage = loggedUser.message!;
+          _incorrectCredentials = true;
+        }
         _loading = false;
       });
     }
@@ -46,27 +43,14 @@ class _LoginInputsState extends State<LoginInputs> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Center(
-            child: SizedBox(
-              height: 25,
-              child: Visibility(
-                visible: incorrectCredentials,
-                child: Text(
-                  _errorLoginMessage,
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? HabiColor.dangerLight
-                        : HabiColor.dangerDark,
-                    // color:  HabiColor.dangerDark,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
-          ),
+              child: ErrorInputLabel(
+            show: _incorrectCredentials,
+            text: _errorLoginMessage,
+          )),
         ),
         TextField(
           controller: _emailController,
-          onChanged: (value) => {setState(() => incorrectCredentials = false)},
+          onChanged: (value) => {setState(() => _incorrectCredentials = false)},
           keyboardType: TextInputType.emailAddress,
           decoration: const InputDecoration(hintText: "email"),
           enabled: !_loading,
@@ -74,7 +58,7 @@ class _LoginInputsState extends State<LoginInputs> {
         const SizedBox(height: 10),
         TextField(
           controller: _passwordController,
-          onChanged: (value) => {setState(() => incorrectCredentials = false)},
+          onChanged: (value) => {setState(() => _incorrectCredentials = false)},
           obscureText: true,
           enableSuggestions: false,
           autocorrect: false,
