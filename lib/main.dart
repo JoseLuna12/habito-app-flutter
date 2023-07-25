@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habito/authentication/screens/sign_in.dart';
+import 'package:habito/features/authentication/screens/sign_in.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/themes/classic.dart';
 

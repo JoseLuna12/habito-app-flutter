@@ -7,7 +7,6 @@ enum RequestType { post, get, delete, put }
 class RequestHabito {
   final bool _debugLogging = const bool.fromEnvironment('DEBUG_NETWORK_LOGGER');
   final String _serverUrl = const String.fromEnvironment('SERVER_URL');
-  //"127.0.0.1:3000";
   late String _url;
   bool _badRequest = false;
   int _status = 200;

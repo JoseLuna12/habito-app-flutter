@@ -1,5 +1,5 @@
-import 'package:habito/authentication/models/backend_response.dart';
-import 'package:habito/authentication/models/user_model.dart';
+import 'package:habito/features/authentication/models/backend_response.dart';
+import 'package:habito/features/authentication/models/user_model.dart';
 import 'package:habito/common/network/request.dart';
 
 Future<HabitoResponse<User>> loginNetwork(String user, String password) async {

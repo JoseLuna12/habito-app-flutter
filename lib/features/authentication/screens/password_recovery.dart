@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/navigation/navigation.dart';
 import 'package:habito/constants/app_icons.dart';
 import 'package:habito/constants/app_measurements.dart';
 
@@ -11,7 +12,7 @@ class PasswordRecovery extends StatelessWidget {
       appBar: AppBar(
         leading: TextButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            navigatePop(context: context);
           },
           child: const Icon(HabiIcons.iconBack),
         ),

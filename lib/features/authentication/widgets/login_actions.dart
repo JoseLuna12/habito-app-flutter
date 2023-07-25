@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:habito/authentication/services/auth_service.dart';
-import 'package:habito/authentication/widgets/error_input_label.dart';
+import 'package:habito/features/authentication/services/auth_service.dart';
+import 'package:habito/features/authentication/services/user_local.dart';
+import 'package:habito/features/authentication/widgets/error_input_label.dart';
 import 'package:habito/constants/app_measurements.dart';
+import 'package:habito/features/timeline/screens/home.dart';
 
 class LoginActions extends StatefulWidget {
   const LoginActions({Key? key}) : super(key: key);
@@ -17,27 +19,39 @@ class _LoginActionsState extends State<LoginActions> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    Future<void> login() async {
+  Future<void> login() async {
+    setState(() {
+      _loading = true;
+    });
+
+    final user = _emailController.text;
+    final pass = _passwordController.text;
+
+    final loggedUser = await loginNetwork(user, pass);
+
+    if (loggedUser.hasError) {
       setState(() {
-        _loading = true;
-      });
-
-      final user = _emailController.text;
-      final pass = _passwordController.text;
-
-      final loggedUser = await loginNetwork(user, pass);
-
-      setState(() {
-        if (loggedUser.hasError) {
-          _errorLoginMessage = loggedUser.message!;
-          _incorrectCredentials = true;
-        }
         _loading = false;
+        _errorLoginMessage = loggedUser.message!;
+        _incorrectCredentials = true;
       });
+      return;
     }
 
+    await saveUser(loggedUser.data!);
+
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         Padding(

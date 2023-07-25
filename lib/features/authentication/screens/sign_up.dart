@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:habito/authentication/widgets/signup_actions.dart';
+import 'package:habito/features/authentication/widgets/signup_actions.dart';
+import 'package:habito/common/navigation/navigation.dart';
 import 'package:habito/constants/app_icons.dart';
 import 'package:habito/constants/app_measurements.dart';
 
@@ -13,7 +14,7 @@ class SignUp extends StatelessWidget {
       appBar: AppBar(
         leading: TextButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            navigatePop(context: context);
           },
           child: const Icon(HabiIcons.iconBack),
         ),

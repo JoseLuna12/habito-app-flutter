@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:habito/authentication/services/auth_service.dart';
-import 'package:habito/authentication/widgets/error_input_label.dart';
+import 'package:habito/features/authentication/services/auth_service.dart';
+import 'package:habito/features/authentication/services/user_local.dart';
+import 'package:habito/features/authentication/widgets/error_input_label.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
 import 'package:habito/constants/app_settings.dart';
@@ -122,7 +123,10 @@ class _SignupActionsState extends State<SignupActions> {
     final res = await signup(user: user, password: password, name: name);
     if (res.hasError) {
       linkErorsToFields(res.message!);
+      return;
     }
+
+    await saveUser(res.data!);
   }
 
   @override
