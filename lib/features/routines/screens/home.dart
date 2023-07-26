@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/providers/user_provider.dart';
-import 'package:habito/features/authentication/models/user_model.dart';
-import 'package:habito/features/authentication/screens/sign_in.dart';
-import 'package:habito/features/authentication/screens/soft_authentication.dart';
-import 'package:habito/features/authentication/services/user_local.dart';
-import 'package:habito/common/navigation/navigation.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
 import 'package:habito/themes/defaults.dart';
@@ -17,7 +12,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<void> logOut() async {
       await context.read<UserProvider>().clearUserData();
-      // print(context.read<UserProvider>().user);
     }
 
     return Scaffold(
