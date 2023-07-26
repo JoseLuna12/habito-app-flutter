@@ -1,58 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/features/authentication/models/user_model.dart';
 import 'package:habito/features/authentication/screens/sign_in.dart';
+import 'package:habito/features/authentication/screens/soft_authentication.dart';
 import 'package:habito/features/authentication/services/user_local.dart';
 import 'package:habito/common/navigation/navigation.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
 import 'package:habito/themes/defaults.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Future<User> getUser() async {
-      final user = await getCurrentUser();
-      if (user == null) {
-        if (context.mounted) {
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const SignIn()));
-        }
-        throw ErrorDescription("User is not logged");
-      }
-      return user;
-    }
-
-    return FutureBuilder<User>(
-      future: getUser(),
-      builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
-        if (snapshot.hasData) {
-          return HomeContent(user: snapshot.data!);
-        } else {
-          return const CircularProgressIndicator();
-        }
-      },
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class HomeContent extends StatelessWidget {
-  User user;
-  HomeContent({super.key, required this.user});
-
-  @override
-  Widget build(BuildContext context) {
     Future<void> logOut() async {
-      await clearUser();
-      if (context.mounted) {
-        navigateNoAnimReplacementsTo(context: context, to: const SignIn());
-      }
+      await context.read<UserProvider>().clearUserData();
+      // print(context.read<UserProvider>().user);
     }
 
     return Scaffold(
-      appBar: HomeAppBar(user: user),
+      appBar: const HomeAppBar(),
       body: ElevatedButton(
         onPressed: logOut,
         child: const Text("Exit"),
@@ -62,18 +31,15 @@ class HomeContent extends StatelessWidget {
 }
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const HomeAppBar({
-    super.key,
-    required this.user,
-  });
-
-  final User user;
+  const HomeAppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   AppBar build(BuildContext context) {
+    // final user = await context.watch<UserProvider>().user;
+
     return AppBar(
       leadingWidth: double.infinity,
       leading: Align(
@@ -92,7 +58,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
               children: [
                 TextSpan(
-                  text: user.name,
+                  text: context.watch<UserProvider>().user ?? "",
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                         fontSize: 26,
                         fontFamily: HabiThemeDefaults.fontFamily,

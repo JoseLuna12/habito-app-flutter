@@ -1,22 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:habito/features/authentication/screens/sign_in.dart';
+import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/constants/app_colors.dart';
+import 'package:habito/features/authentication/screens/soft_authentication.dart';
+import 'package:habito/features/routines/screens/home.dart';
 import 'package:habito/themes/classic.dart';
 
+import 'package:provider/provider.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => UserProvider(),
+      )
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: HabiTheme.lightTheme,
-      darkTheme: HabiTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const SignIn(),
+    return FutureBuilder<String?>(
+      future: context.read<UserProvider>().initUser(),
+      builder: (context, snapshot) {
+        Widget presenter = const SoftSignIn();
+
+        if (snapshot.hasError) {
+          return const Placeholder();
+        }
+
+        if (context.watch<UserProvider>().user == null) {
+          presenter = const SoftSignIn();
+        } else {
+          presenter = const HomeScreen();
+        }
+
+        return MaterialApp(
+          title: 'Habito.',
+          theme: HabiTheme.lightTheme,
+          darkTheme: HabiTheme.darkTheme,
+          themeMode: ThemeMode.system,
+          home: presenter,
+        );
+      },
     );
   }
 }

@@ -3,10 +3,10 @@ import 'package:habito/constants/app_colors.dart';
 
 //ignore: must_be_immutable
 class ErrorInputLabel extends StatelessWidget {
-  bool show = false;
-  String text;
+  final bool show;
+  final String text;
 
-  ErrorInputLabel({Key? key, required this.show, required this.text})
+  const ErrorInputLabel({Key? key, required this.show, required this.text})
       : super(key: key);
 
   @override

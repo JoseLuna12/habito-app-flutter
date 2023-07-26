@@ -3,7 +3,7 @@ import 'package:habito/features/authentication/services/auth_service.dart';
 import 'package:habito/features/authentication/services/user_local.dart';
 import 'package:habito/features/authentication/widgets/error_input_label.dart';
 import 'package:habito/constants/app_measurements.dart';
-import 'package:habito/features/timeline/screens/home.dart';
+import 'package:habito/features/routines/screens/home.dart';
 
 class LoginActions extends StatefulWidget {
   const LoginActions({Key? key}) : super(key: key);

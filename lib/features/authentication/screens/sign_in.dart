@@ -9,7 +9,7 @@ import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
 
 import 'package:habito/themes/defaults.dart';
-import 'package:habito/features/timeline/screens/home.dart';
+import 'package:habito/features/routines/screens/home.dart';
 
 class SignIn extends StatelessWidget {
   const SignIn({Key? key}) : super(key: key);

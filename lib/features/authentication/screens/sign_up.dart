@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habito/features/authentication/widgets/error_input_label.dart';
 import 'package:habito/features/authentication/widgets/signup_actions.dart';
 import 'package:habito/common/navigation/navigation.dart';
 import 'package:habito/constants/app_icons.dart';
@@ -30,7 +31,9 @@ class SignUp extends StatelessWidget {
             SizedBox(height: 30),
             Text("User Data"),
             SizedBox(height: 25),
-            Expanded(child: SignupActions()),
+            Expanded(
+              child: SignupActions(),
+            ),
           ],
         ),
       ),

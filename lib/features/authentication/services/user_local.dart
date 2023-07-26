@@ -6,9 +6,9 @@ Future<void> saveStringToLocalStorage(String key, String value) async {
   await prefs.setString(key, value);
 }
 
-Future<String> getStringFromLocalStorage(String key) async {
+Future<String?> getStringFromLocalStorage(String key) async {
   final prefs = await SharedPreferences.getInstance();
-  return prefs.getString(key) ?? '';
+  return prefs.getString(key);
 }
 
 Future<User> saveUser(User user) async {
@@ -21,6 +21,11 @@ Future<User> saveUser(User user) async {
   return user;
 }
 
+Future<bool> clearUserName() async {
+  final prefs = await SharedPreferences.getInstance();
+  return await prefs.remove('name');
+}
+
 Future<List<bool>> clearUser() async {
   final prefs = await SharedPreferences.getInstance();
   return Future.wait([
@@ -31,11 +36,19 @@ Future<List<bool>> clearUser() async {
   ]);
 }
 
+Future<String?> getCurrentUserName() {
+  return getStringFromLocalStorage('name');
+}
+
+Future<void> saveUserSoft(String name) async {
+  await saveStringToLocalStorage('name', name);
+}
+
 Future<User?> getCurrentUser() async {
-  final String id = await getStringFromLocalStorage('id');
-  final String name = await getStringFromLocalStorage('name');
-  final String email = await getStringFromLocalStorage('email');
-  final String token = await getStringFromLocalStorage('token');
+  final String id = await getStringFromLocalStorage('id') ?? "";
+  final String name = await getStringFromLocalStorage('name') ?? "";
+  final String email = await getStringFromLocalStorage('email') ?? "";
+  final String token = await getStringFromLocalStorage('token') ?? "";
 
   if (token.isNotEmpty) {
     return User(id: int.parse(id), name: name, email: email, jwToken: token);
