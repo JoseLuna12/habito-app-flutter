@@ -13,7 +13,6 @@ class UserProvider extends ChangeNotifier {
 
   Future<String?> initUser() async {
     _user ??= await getUser();
-
     return _user;
   }
 
@@ -25,8 +24,7 @@ class UserProvider extends ChangeNotifier {
 
   Future<String?> getUser() async {
     final userName = await getCurrentUserName();
-    // print(userName);
-    // notifyListeners();
+    notifyListeners();
     return userName;
   }
 

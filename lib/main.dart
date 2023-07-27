@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/providers/task_provider.dart';
 import 'package:habito/common/providers/user_provider.dart';
+import 'package:habito/common/widgets/loading_placeholder.dart';
 import 'package:habito/constants/app_colors.dart';
+import 'package:habito/features/authentication/screens/sign_in.dart';
 import 'package:habito/features/authentication/screens/soft_authentication.dart';
 import 'package:habito/features/routines/screens/home.dart';
 import 'package:habito/themes/classic.dart';
@@ -8,14 +11,19 @@ import 'package:habito/themes/classic.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-        create: (context) => UserProvider(),
-      )
-    ],
-    child: const MyApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TaskProvider(),
+        )
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,29 +31,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: context.read<UserProvider>().initUser(),
-      builder: (context, snapshot) {
-        Widget presenter = const SoftSignIn();
+    return MaterialApp(
+      title: 'Habito.',
+      theme: HabiTheme.lightTheme,
+      darkTheme: HabiTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      home: FutureBuilder<String?>(
+        future: context.read<UserProvider>().initUser(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (context.watch<UserProvider>().user == null) {
+              return const SoftSignIn();
+            }
+            return HomeScreen();
+          }
 
-        if (snapshot.hasError) {
-          return const Placeholder();
-        }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingPlaceholder();
+          }
 
-        if (context.watch<UserProvider>().user == null) {
-          presenter = const SoftSignIn();
-        } else {
-          presenter = const HomeScreen();
-        }
+          if (snapshot.hasError) {
+            return const Placeholder();
+          }
 
-        return MaterialApp(
-          title: 'Habito.',
-          theme: HabiTheme.lightTheme,
-          darkTheme: HabiTheme.darkTheme,
-          themeMode: ThemeMode.system,
-          home: presenter,
-        );
-      },
+          return const LoadingPlaceholder();
+        },
+      ),
     );
   }
 }
