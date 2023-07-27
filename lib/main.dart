@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/database/shared_preferences.dart';
+import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/task_provider.dart';
 import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/common/widgets/loading_placeholder.dart';
@@ -9,16 +11,25 @@ import 'package:habito/features/routines/screens/home.dart';
 import 'package:habito/themes/classic.dart';
 
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HabitoSharedPreferences pref = HabitoSharedPreferences(
+    sharedPreferences: await SharedPreferences.getInstance(),
+  );
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => UserProvider(),
+          create: (context) => UserProvider(preferences: pref),
         ),
         ChangeNotifierProvider(
           create: (context) => TaskProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AppStateProvider(),
         )
       ],
       child: const MyApp(),
@@ -29,37 +40,64 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // @override
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Habito.',
-      theme: HabiTheme.lightTheme,
-      darkTheme: HabiTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: FutureBuilder<String?>(
-        future: context.read<UserProvider>().initUser(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (context.watch<UserProvider>().user == null) {
+        title: 'Habito',
+        theme: HabiTheme.lightTheme,
+        darkTheme: HabiTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        home: StreamBuilder<UserLoadingStatus>(
+          stream: Provider.of<UserProvider>(context).userStatus,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              if (!Provider.of<UserProvider>(context).isAppInitialized) {
+                Provider.of<UserProvider>(context, listen: false).initApp();
+              }
+              return const LoadingPlaceholder();
+            }
+            if (snapshot.data == UserLoadingStatus.loading) {
+              return const LoadingPlaceholder();
+            }
+            if (snapshot.data == UserLoadingStatus.unauthenticated) {
               return const SoftSignIn();
             }
-            return HomeScreen();
-          }
+            if (snapshot.data == UserLoadingStatus.authenticated) {
+              return const HomeScreen();
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.data == UserLoadingStatus.error) {
+              return const Placeholder();
+            }
+
             return const LoadingPlaceholder();
-          }
-
-          if (snapshot.hasError) {
-            return const Placeholder();
-          }
-
-          return const LoadingPlaceholder();
-        },
-      ),
-    );
+          },
+        ));
   }
 }
+
+//  FutureBuilder<String?>(
+//         future: context.read<UserProvider>().initUser(),
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.done) {
+//             if (context.watch<UserProvider>().user == null) {
+//               return const SoftSignIn();
+//             }
+//             return HomeScreen();
+//           }
+
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return const LoadingPlaceholder();
+//           }
+
+//           if (snapshot.hasError) {
+//             return const Placeholder();
+//           }
+
+//           return const LoadingPlaceholder();
+//         },
+//       ),
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);

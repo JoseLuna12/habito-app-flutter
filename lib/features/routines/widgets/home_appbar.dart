@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
@@ -13,7 +14,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   AppBar build(BuildContext context) {
-    // final user = await context.watch<UserProvider>().user;
+    final user = context.read<UserProvider>().softGetCurrentUser();
 
     return AppBar(
       leadingWidth: double.infinity,
@@ -33,7 +34,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
               children: [
                 TextSpan(
-                  text: context.watch<UserProvider>().user ?? "",
+                  text: user,
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                         fontSize: 26,
                         fontFamily: HabiThemeDefaults.fontFamily,
@@ -48,11 +49,18 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      actions: const [
+      actions: [
         Padding(
-          padding: EdgeInsets.only(right: HabiMeasurements.paddingRight),
-          child: CircleAvatar(
-            backgroundColor: HabiColor.orange,
+          padding: const EdgeInsets.only(right: HabiMeasurements.paddingRight),
+          child: Visibility(
+            visible: !context.watch<AppStateProvider>().isKeyboardOpen,
+            replacement: TextButton(
+              onPressed: () => context.read<AppStateProvider>().closeKeyboard(),
+              child: const Text("close"),
+            ),
+            child: const CircleAvatar(
+              backgroundColor: HabiColor.orange,
+            ),
           ),
         )
       ],

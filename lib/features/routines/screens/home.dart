@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/features/routines/widgets/home_appbar.dart';
 import 'package:habito/features/routines/widgets/tasks_column.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Future<void> logOut() async {
-    //   await context.read<UserProvider>().clearUserData();
-    // }
+    void logOut() {
+      context.read<UserProvider>().softLogOutUser();
+    }
 
-    return Scaffold(
-      appBar: const HomeAppBar(),
+    return const Scaffold(
+      appBar: HomeAppBar(),
       // resizeToAvoidBottomInset: false,
       body: Column(
         children: [

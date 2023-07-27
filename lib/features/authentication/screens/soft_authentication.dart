@@ -27,7 +27,7 @@ class _SoftSignInState extends State<SoftSignIn> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> saveUserLocally() async {
+    void saveUserLocally() {
       if (nameController.text.isEmpty) {
         updateErrorLabel("Field cannot be empty!");
         return;
@@ -39,7 +39,7 @@ class _SoftSignInState extends State<SoftSignIn> {
         return;
       }
 
-      await context.read<UserProvider>().setUser(nameController.text);
+      context.read<UserProvider>().softLoginUser(nameController.text);
     }
 
     return Scaffold(
