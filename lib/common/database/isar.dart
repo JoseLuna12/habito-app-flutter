@@ -20,6 +20,11 @@ class IsarDatabase {
     return isar.tasks.where().findAll();
   }
 
+  Future<List<Task>> getTasksByDay(String keyDay) async {
+    final isar = await _isar;
+    return isar.tasks.where().filter().timeEqualTo(keyDay).findAll();
+  }
+
   Future<void> deleteTask(Id taskId) async {
     final isar = await _isar;
     isar.writeTxn(() => isar.tasks.delete(taskId));

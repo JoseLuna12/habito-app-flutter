@@ -8,20 +8,21 @@ class HabiWeek {
   late int _todayWeekIndex;
   late WeekList _weeks;
   late final HabiDay _today;
+  late HabiDay _activeDay;
   late int _activeWeekIndex;
-  late int _activeDayIndex;
 
   HabiWeek() {
     _weeks = DateHelper.initDates();
     _today = DateHelper.getCurrentDate();
     _todayWeekIndex = _getCurrentWeekIndexOf(_weeks);
+    _activeDay = _today;
     _activeWeekIndex = _todayWeekIndex;
-    _activeDayIndex = _today.indexOfDay;
   }
 
   int get todayWeekIndex => _todayWeekIndex;
   WeekList get weeks => _weeks;
   HabiDay get today => _today;
+  HabiDay get activeDay => _activeDay;
   HabiDay get todayInArray {
     return weeks[_todayWeekIndex][today.indexOfDay];
   }
@@ -40,9 +41,9 @@ class HabiWeek {
   }
 
   void activateDayByIndex(int week, int day) {
-    _weeks[_activeWeekIndex][_activeDayIndex].setIsActive(false);
+    _weeks[_activeWeekIndex][_activeDay.indexOfDay].setIsActive(false);
     _weeks[week][day].setIsActive(true);
-    _activeDayIndex = day;
+    _activeDay = _weeks[week][day];
     _activeWeekIndex = week;
   }
 

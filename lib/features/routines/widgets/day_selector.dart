@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/date/week.dart';
+import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
+import 'package:habito/constants/app_colors.dart';
 import 'package:habito/features/routines/widgets/day_item.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +27,15 @@ class _DaySelectorState extends State<DaySelector> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final bool isDarkMode =
+        context.watch<AppStateProvider>().isDarkMode(context);
+
+    final Color backgroundColor = isDarkMode ? HabiColor.blue : HabiColor.white;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+      ),
       height: 73,
       child: Row(
         children: [

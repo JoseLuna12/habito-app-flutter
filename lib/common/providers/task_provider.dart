@@ -16,6 +16,12 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> initTaskByDay(String time) async {
+    final db = IsarDatabase();
+    _tasks = await db.getTasksByDay(time);
+    notifyListeners();
+  }
+
   Future<void> addTask(Task task) async {
     final db = IsarDatabase();
     await db.saveTask(task);

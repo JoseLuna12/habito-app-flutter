@@ -7,6 +7,10 @@ class AppStateProvider extends ChangeNotifier {
 
   bool get isKeyboardOpen => _isKeyboardOpen;
 
+  bool isDarkMode(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
   void closeKeyboard() {
     if (_currentInputFocus == null) {
       return;

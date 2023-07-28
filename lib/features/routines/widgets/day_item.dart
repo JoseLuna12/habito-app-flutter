@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/date/day.dart';
+import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/constants/app_measurements.dart';
@@ -12,7 +13,8 @@ class DayListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final bool isDarkMode =
+        context.watch<AppStateProvider>().isDarkMode(context);
 
     Color dayNameColor = isDarkMode ? HabiColor.gray : HabiColor.gray;
     Color dayNumberColor = isDarkMode ? HabiColor.white : HabiColor.blue;

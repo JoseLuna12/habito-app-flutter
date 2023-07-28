@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
+import 'package:habito/common/providers/week_provider.dart';
 import 'package:habito/constants/app_colors.dart';
 
 import 'package:provider/provider.dart';
@@ -17,20 +18,23 @@ class TasksColumn extends StatefulWidget {
 }
 
 class _TasksColumnState extends State<TasksColumn> {
-  // final listScrollController = ScrollController();
-
   final taskInputController = TextEditingController();
   final inputFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode =
+        context.watch<AppStateProvider>().isDarkMode(context);
+    final buttonBackgroundColor = isDarkMode ? HabiColor.blue : HabiColor.white;
+    final selectedDay = context.watch<WeekProvider>().weeksValues.activeDay;
+
     void newTask(String task) {
       if (task.isEmpty) {
         return;
       }
       final t = Task()
         ..name = task
-        ..time = "26:07:2023";
+        ..time = selectedDay.keyDate;
       context.read<TaskProvider>().addTask(t);
       taskInputController.clear();
     }
@@ -41,22 +45,10 @@ class _TasksColumnState extends State<TasksColumn> {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            left: HabiMeasurements.paddingHorizontalButtonXl,
-            right: HabiMeasurements.paddingHorizontalButtonXl,
-            bottom: 30,
-          ),
-          child: ElevatedButton(
-            onPressed: context.watch<AppStateProvider>().isKeyboardOpen
-                ? null
-                : newTaskAction,
-            child: const Text("new task"),
-          ),
-        ),
         Expanded(
           child: FutureBuilder(
-            future: context.read<TaskProvider>().initTasks(),
+            future:
+                context.read<TaskProvider>().initTaskByDay(selectedDay.keyDate),
             builder: (context, snapshot) {
               List<Task> tasks =
                   context.watch<TaskProvider>().tasks.reversed.toList();
@@ -66,9 +58,29 @@ class _TasksColumnState extends State<TasksColumn> {
                 ),
                 child: ListView.builder(
                   // controller: listScrollController,
-                  itemCount: tasks.length,
+                  shrinkWrap: true,
+                  // physics: const NeverScrollableScrollPhysics(),
+                  itemCount: tasks.length + 1,
                   itemBuilder: (context, index) {
-                    return TaskListTile(task: tasks[index]);
+                    if (index == 0) {
+                      return Container(
+                        padding: const EdgeInsets.only(
+                          top: 25,
+                          left: HabiMeasurements.paddingHorizontalButtonXl,
+                          right: HabiMeasurements.paddingHorizontalButtonXl,
+                          bottom: 30,
+                        ),
+                        color: buttonBackgroundColor,
+                        child: ElevatedButton(
+                          onPressed:
+                              context.watch<AppStateProvider>().isKeyboardOpen
+                                  ? null
+                                  : newTaskAction,
+                          child: const Text("new task"),
+                        ),
+                      );
+                    }
+                    return TaskListTile(task: tasks[index - 1]);
                   },
                 ),
               );
@@ -140,7 +152,13 @@ class _TaskListTileState extends State<TaskListTile> {
             children: [
               Padding(
                 padding: EdgeInsets.only(right: 10),
-                child: Text("Delete"),
+                child: Text(
+                  "Delete",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: HabiColor.white,
+                  ),
+                ),
               )
             ],
           ),
