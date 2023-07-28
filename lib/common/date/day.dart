@@ -1,14 +1,25 @@
 class HabiDay {
   final DateTime date;
   bool _isToday = false;
+  bool _isActive = false;
   HabiDay({required this.date, bool? today}) {
     _isToday = today ?? false;
+    _isActive = today ?? false;
   }
 
   bool get isToday => _isToday;
+  bool get isActive => _isActive;
 
   String get weekDayLong {
     return getWeekDayLong(date.weekday);
+  }
+
+  int get indexOfDay {
+    return date.weekday - 1;
+  }
+
+  int get dayOfTheMonth {
+    return date.day;
   }
 
   String get weekDayShort {
@@ -102,5 +113,9 @@ class HabiDay {
     } else {
       _isToday = false;
     }
+  }
+
+  void setIsActive(bool active) {
+    _isActive = active;
   }
 }

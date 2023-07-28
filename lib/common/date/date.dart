@@ -5,6 +5,18 @@ class DateHelper {
     return HabiDay(date: DateTime.now(), today: true);
   }
 
+  static List<List<HabiDay>> initDates({HabiDay? from}) {
+    final fromDate = from ?? getCurrentDate();
+
+    final currentWeek = getCurrentWeek();
+    final currentMonday = currentWeek[0];
+
+    final nextWeek = getNextWeekFromMonday(currentMonday);
+    final previusWeek = getPreviousWeekendFromMonday(currentMonday);
+
+    return [previusWeek, currentWeek, nextWeek];
+  }
+
   static List<HabiDay> getCurrentWeek() {
     final currentDay = getCurrentDate();
 
@@ -20,6 +32,9 @@ class DateHelper {
           Duration(days: i),
         ),
       );
+      if (newHabiday.keyDate == currentDay.keyDate) {
+        newHabiday.setIsActive(true);
+      }
       newHabiday.setTodayValue(currentDay);
       weekDates.add(newHabiday);
     }

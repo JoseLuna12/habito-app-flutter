@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/database/shared_preferences.dart';
+import 'package:habito/common/date/week.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/task_provider.dart';
 import 'package:habito/common/providers/user_provider.dart';
+import 'package:habito/common/providers/week_provider.dart';
 import 'package:habito/common/widgets/loading_placeholder.dart';
 import 'package:habito/constants/app_colors.dart';
-import 'package:habito/features/authentication/screens/sign_in.dart';
 import 'package:habito/features/authentication/screens/soft_authentication.dart';
 import 'package:habito/features/routines/screens/home.dart';
 import 'package:habito/themes/classic.dart';
@@ -18,6 +19,7 @@ Future<void> main() async {
   HabitoSharedPreferences pref = HabitoSharedPreferences(
     sharedPreferences: await SharedPreferences.getInstance(),
   );
+  HabiWeek weekData = HabiWeek();
 
   runApp(
     MultiProvider(
@@ -30,6 +32,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => AppStateProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => WeekProvider(weeksValues: weekData),
         )
       ],
       child: const MyApp(),
