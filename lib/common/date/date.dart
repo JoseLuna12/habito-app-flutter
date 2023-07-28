@@ -6,7 +6,7 @@ class DateHelper {
   }
 
   static List<List<HabiDay>> initDates({HabiDay? from}) {
-    final fromDate = from ?? getCurrentDate();
+    // final fromDate = from ?? getCurrentDate();
 
     final currentWeek = getCurrentWeek();
     final currentMonday = currentWeek[0];

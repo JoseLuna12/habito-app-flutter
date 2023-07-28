@@ -22,7 +22,7 @@ class SignIn extends StatelessWidget {
         if (context.mounted) {
           navigateNoAnimReplacementsTo(
             context: context,
-            to: HomeScreen(),
+            to: const HomeScreen(),
           );
         }
         return true;
