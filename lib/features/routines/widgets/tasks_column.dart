@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
 import 'package:habito/constants/app_colors.dart';
+import 'package:habito/features/routines/widgets/input_task.dart';
 
 import 'package:provider/provider.dart';
 import 'package:habito/constants/app_measurements.dart';
@@ -27,17 +28,6 @@ class _TasksColumnState extends State<TasksColumn> {
         context.watch<AppStateProvider>().isDarkMode(context);
     final buttonBackgroundColor = isDarkMode ? HabiColor.blue : HabiColor.white;
     final selectedDay = context.watch<WeekProvider>().weeksValues.activeDay;
-
-    void newTask(String task) {
-      if (task.isEmpty) {
-        return;
-      }
-      final t = Task()
-        ..name = task
-        ..time = selectedDay.keyDate;
-      context.read<TaskProvider>().addTask(t);
-      taskInputController.clear();
-    }
 
     void newTaskAction() {
       context.read<AppStateProvider>().openKeyboard(inputFocusNode);
@@ -87,22 +77,7 @@ class _TasksColumnState extends State<TasksColumn> {
             },
           ),
         ),
-        Visibility(
-          visible: context.watch<AppStateProvider>().isKeyboardOpen,
-          child: TextField(
-            controller: taskInputController,
-            focusNode: inputFocusNode,
-            // onChanged: (_) => updateErrorLabel(""),
-            textCapitalization: TextCapitalization.words,
-            keyboardType: TextInputType.name,
-            onSubmitted: (value) => newTask(value),
-            onEditingComplete: () {
-              if (taskInputController.text.isEmpty) {
-                FocusManager.instance.primaryFocus?.unfocus();
-              }
-            },
-          ),
-        )
+        const InputTask()
       ],
     );
   }
@@ -166,6 +141,8 @@ class _TaskListTileState extends State<TaskListTile> {
         // secondaryBackground: const ListTile(),
         child: ListTile(
           title: Text(widget.task.name),
+          subtitle:
+              widget.task.note == null ? null : Text(widget.task.note ?? ""),
         ),
       ),
     );

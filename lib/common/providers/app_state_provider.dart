@@ -23,8 +23,8 @@ class AppStateProvider extends ChangeNotifier {
 
   void openKeyboard(FocusNode inputNode) {
     _currentInputFocus = inputNode;
-    inputNode.requestFocus();
     _isKeyboardOpen = true;
+    inputNode.requestFocus();
     notifyListeners();
   }
 }
