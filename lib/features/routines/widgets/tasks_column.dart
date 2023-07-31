@@ -141,8 +141,9 @@ class _TaskListTileState extends State<TaskListTile> {
         // secondaryBackground: const ListTile(),
         child: ListTile(
           title: Text(widget.task.name),
-          subtitle:
-              widget.task.note == null ? null : Text(widget.task.note ?? ""),
+          subtitle: widget.task.note == null || widget.task.note == ""
+              ? null
+              : Text(widget.task.note ?? ""),
         ),
       ),
     );

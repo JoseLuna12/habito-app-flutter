@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/database/isar.dart';
 import 'package:habito/common/models/task.isar.dart';
-// import 'package:habito/features/authentication/services/user_local.dart';
-
-// enum UserLoadingStatus { loading, loaded, none }
 
 class TaskProvider extends ChangeNotifier {
   List<Task> _tasks = List<Task>.empty(growable: true);
@@ -22,10 +19,20 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> saveRecommendation(
+    String recommendation,
+    IsarDatabase? database,
+  ) async {
+    final db = database ?? IsarDatabase();
+    await db.saveRecom(recommendation);
+  }
+
   Future<void> addTask(Task task) async {
     final db = IsarDatabase();
     await db.saveTask(task);
     _tasks.add(task);
+    saveRecommendation(task.name, db);
+
     notifyListeners();
   }
 

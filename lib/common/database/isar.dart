@@ -1,5 +1,6 @@
 import 'package:habito/common/models/routine.isar.dart';
 import 'package:habito/common/models/task.isar.dart';
+import 'package:habito/common/models/task_recommendation.isar.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -8,6 +9,25 @@ class IsarDatabase {
 
   IsarDatabase() {
     _isar = _getDb();
+  }
+
+  Future<void> saveRecom(String recomm) async {
+    final isar = await _isar;
+    final newRecomm = Recommendation()..name = recomm;
+    final exists =
+        await isar.recommendations.filter().nameEqualTo(recomm).findFirst();
+    if (exists != null) {
+      return;
+    }
+    isar.writeTxnSync(() => isar.recommendations.putSync(newRecomm));
+  }
+
+  Future<List<Recommendation>> getRecommendationsFrom(String value) async {
+    final isar = await _isar;
+    return isar.recommendations
+        .filter()
+        .nameStartsWith(value, caseSensitive: false)
+        .findAll();
   }
 
   Future<void> saveTask(Task task) async {
@@ -35,7 +55,7 @@ extension IsarInitialization on IsarDatabase {
   Future<Isar> _initIsar() async {
     final dir = await getApplicationDocumentsDirectory();
     final db = await Isar.open(
-      [TaskSchema, RoutineSchema],
+      [TaskSchema, RoutineSchema, RecommendationSchema],
       directory: dir.path,
     );
     return db;

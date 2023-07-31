@@ -32,7 +32,7 @@ class _InputTaskState extends State<InputTask> {
   @override
   Widget build(BuildContext context) {
     final inputVisibility = context.watch<AppStateProvider>().isKeyboardOpen;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.watch<AppStateProvider>().isDarkMode(context);
     final HabiDay selectedDay =
         context.watch<WeekProvider>().weeksValues.activeDay;
     void newTask() {
@@ -48,9 +48,14 @@ class _InputTaskState extends State<InputTask> {
         ..time = selectedDay.keyDate
         ..note = _noteInputController.text;
       context.read<TaskProvider>().addTask(t);
+      context.read<AppStateProvider>().resetRecommendations();
       _taskInputController.clear();
       _noteInputController.clear();
-      // context.watch<AppStateProvider>().
+    }
+
+    Future<void> recommendationAction(String value) async {
+      context.read<AppStateProvider>().updateCurrentInputValue(value);
+      await context.read<AppStateProvider>().updateRecommendations();
     }
 
     if (inputVisibility) {
@@ -104,6 +109,7 @@ class _InputTaskState extends State<InputTask> {
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.text,
                 onSubmitted: (_) => newTask(),
+                onChanged: (value) => recommendationAction(value),
                 onEditingComplete: () {
                   if (_taskInputController.text.isEmpty) {
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -145,26 +151,7 @@ class _InputTaskState extends State<InputTask> {
                 ),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: HabiMeasurements.paddingHorizontal),
-                child: Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "Test",
-                        style: TextStyle(
-                          height: 1,
-                          fontSize: 14,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            )
+            RecommendationList(taskInputController: _taskInputController)
           ],
         ),
       ),
@@ -214,6 +201,65 @@ class _InputTaskState extends State<InputTask> {
         gapPadding: 0,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(HabiMeasurements.cornerRadius),
+        ),
+      ),
+    );
+  }
+}
+
+class RecommendationList extends StatelessWidget {
+  const RecommendationList({
+    super.key,
+    required TextEditingController taskInputController,
+  }) : _taskInputController = taskInputController;
+
+  final TextEditingController _taskInputController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: HabiMeasurements.paddingHorizontal,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+                child: StreamBuilder(
+              stream: context.watch<AppStateProvider>().recommendationsStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final textValue = snapshot.data![index].name;
+                      return TextButton(
+                        onPressed: () {
+                          _taskInputController.text = textValue;
+                          _taskInputController.selection =
+                              TextSelection.fromPosition(
+                            TextPosition(offset: textValue.length),
+                          );
+                        },
+                        child: Text(
+                          textValue,
+                          style: const TextStyle(
+                            height: 1,
+                            fontSize: 14,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                return const SizedBox();
+              },
+            ))
+          ],
         ),
       ),
     );
