@@ -2,13 +2,17 @@ class HabiDay {
   final DateTime date;
   bool _isToday = false;
   bool _isActive = false;
+  // late HabiDay _yesterday;
   HabiDay({required this.date, bool? today}) {
     _isToday = today ?? false;
     _isActive = today ?? false;
+    // final yesterday = date.subtract(Duration(days: 1));
+    // _yesterday = HabiDay(date: yesterday);
   }
 
   bool get isToday => _isToday;
   bool get isActive => _isActive;
+  // HabiDay get yesterday => _yesterday;
 
   String get weekDayLong {
     return getWeekDayLong(date.weekday);

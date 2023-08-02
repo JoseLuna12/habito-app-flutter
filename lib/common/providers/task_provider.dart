@@ -19,6 +19,26 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> initRoutineByDay(String time) async {
+    final db = IsarDatabase();
+    final currentRoutine = await db.getRoutineByTime(time: time);
+    final tasksLinks = currentRoutine?.tasks;
+    final List<Task> currentTasks = [];
+    if (tasksLinks != null) {
+      for (var element in tasksLinks) {
+        currentTasks.add(element);
+      }
+    }
+    _tasks = currentTasks;
+    notifyListeners();
+  }
+
+  Future<void> completeRoutineByDay(String time) async {
+    final db = IsarDatabase();
+    await db.completeRoutine(time);
+    notifyListeners();
+  }
+
   Future<void> saveRecommendation(
     String recommendation,
     IsarDatabase? database,
@@ -27,11 +47,18 @@ class TaskProvider extends ChangeNotifier {
     await db.saveRecom(recommendation);
   }
 
+  Future<void> addTaskToRoutine(Task task) async {
+    final db = IsarDatabase();
+    await db.saveTaskToRoutine(task.time ?? "", task);
+    await saveRecommendation(task.name, db);
+    notifyListeners();
+  }
+
   Future<void> addTask(Task task) async {
     final db = IsarDatabase();
     await db.saveTask(task);
     _tasks.add(task);
-    saveRecommendation(task.name, db);
+    await saveRecommendation(task.name, db);
 
     notifyListeners();
   }

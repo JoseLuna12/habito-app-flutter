@@ -30,6 +30,48 @@ class IsarDatabase {
         .findAll();
   }
 
+  Future<void> completeRoutine(String time) async {
+    final isar = await _isar;
+    final routine = await getRoutineByTime(time: time, isarInstance: isar);
+    if (routine != null) {
+      routine.completed = true;
+      isar.writeTxnSync(() {
+        isar.routines.putSync(routine);
+      });
+      // await isar.routines.put(routine);
+    }
+  }
+
+  Future<Routine?> getRoutineByTime(
+      {required String time, Isar? isarInstance}) async {
+    final isar = isarInstance ?? await _isar;
+    return isar.routines.where().filter().timeEqualTo(time).findFirst();
+  }
+
+  Future<void> createRoutine(
+      {required Routine routine, Isar? isarInstance}) async {
+    final isar = isarInstance ?? await _isar;
+    isar.writeTxnSync(() => {isar.routines.putSync(routine)});
+  }
+
+  Future<void> saveTaskToRoutine(String time, Task task) async {
+    final isar = await _isar;
+    final routine = await getRoutineByTime(time: time, isarInstance: isar);
+    if (routine == null) {
+      final newRoutine = Routine()
+        ..name = time
+        ..time = time
+        ..tasks.add(task);
+      await createRoutine(routine: newRoutine, isarInstance: isar);
+      return;
+    }
+
+    routine.tasks.add(task);
+    isar.writeTxnSync(() {
+      routine.tasks.saveSync();
+    });
+  }
+
   Future<void> saveTask(Task task) async {
     final isar = await _isar;
     isar.writeTxnSync(() => isar.tasks.putSync(task));
@@ -47,7 +89,7 @@ class IsarDatabase {
 
   Future<void> deleteTask(Id taskId) async {
     final isar = await _isar;
-    isar.writeTxn(() => isar.tasks.delete(taskId));
+    isar.writeTxnSync(() => isar.tasks.deleteSync(taskId));
   }
 }
 

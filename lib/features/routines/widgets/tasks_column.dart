@@ -37,11 +37,38 @@ class _TasksColumnState extends State<TasksColumn> {
       children: [
         Expanded(
           child: FutureBuilder(
-            future:
-                context.read<TaskProvider>().initTaskByDay(selectedDay.keyDate),
+            future: context
+                .watch<TaskProvider>()
+                .initRoutineByDay(selectedDay.keyDate),
             builder: (context, snapshot) {
               List<Task> tasks =
-                  context.watch<TaskProvider>().tasks.reversed.toList();
+                  context.read<TaskProvider>().tasks.reversed.toList();
+
+              if (tasks.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: HabiMeasurements.paddingHorizontal,
+                  ),
+                  child: Column(
+                    children: [
+                      addTaskButton(
+                        buttonBackgroundColor,
+                        context,
+                        newTaskAction,
+                      ),
+                      Expanded(
+                        child: Visibility(
+                          visible:
+                              !context.watch<AppStateProvider>().isKeyboardOpen,
+                          child: const Center(
+                            child: Text("No tasks for today 🥲"),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
               return Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: HabiMeasurements.paddingHorizontal,
@@ -53,21 +80,10 @@ class _TasksColumnState extends State<TasksColumn> {
                   itemCount: tasks.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      return Container(
-                        padding: const EdgeInsets.only(
-                          top: 25,
-                          left: HabiMeasurements.paddingHorizontalButtonXl,
-                          right: HabiMeasurements.paddingHorizontalButtonXl,
-                          bottom: 30,
-                        ),
-                        color: buttonBackgroundColor,
-                        child: ElevatedButton(
-                          onPressed:
-                              context.watch<AppStateProvider>().isKeyboardOpen
-                                  ? null
-                                  : newTaskAction,
-                          child: const Text("new task"),
-                        ),
+                      return addTaskButton(
+                        buttonBackgroundColor,
+                        context,
+                        newTaskAction,
                       );
                     }
                     return TaskListTile(task: tasks[index - 1]);
@@ -79,6 +95,28 @@ class _TasksColumnState extends State<TasksColumn> {
         ),
         const InputTask()
       ],
+    );
+  }
+
+  Container addTaskButton(
+    Color buttonBackgroundColor,
+    BuildContext context,
+    void Function() newTaskAction,
+  ) {
+    return Container(
+      padding: const EdgeInsets.only(
+        top: 25,
+        left: HabiMeasurements.paddingHorizontalButtonXl,
+        right: HabiMeasurements.paddingHorizontalButtonXl,
+        bottom: 30,
+      ),
+      color: buttonBackgroundColor,
+      child: ElevatedButton(
+        onPressed: context.watch<AppStateProvider>().isKeyboardOpen
+            ? null
+            : newTaskAction,
+        child: const Text("new task"),
+      ),
     );
   }
 }

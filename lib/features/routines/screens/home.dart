@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habito/features/routines/widgets/bottom_bar.dart';
 // import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/features/routines/widgets/day_selector.dart';
 import 'package:habito/features/routines/widgets/home_appbar.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends StatelessWidget {
     // }
 
     return const Scaffold(
+      bottomNavigationBar: BottomBar(),
       appBar: HomeAppBar(),
       // resizeToAvoidBottomInset: false,
       body: Column(

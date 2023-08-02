@@ -10,6 +10,7 @@ class HabiColor {
   static const Color white = Color.fromARGB(255, 255, 255, 255);
 
   //variations
+  static const Color orangeLight = Color.fromARGB(255, 255, 181, 62);
   static const Color grayLight = Color.fromARGB(255, 246, 246, 246);
   static const Color grayDark = Color.fromARGB(255, 86, 92, 105);
   static const Color blueDark = Color.fromARGB(255, 12, 21, 38);
