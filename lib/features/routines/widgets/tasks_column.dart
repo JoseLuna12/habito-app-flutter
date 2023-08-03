@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habito/common/date/day.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
+import 'package:habito/common/widgets/loading_placeholder.dart';
 import 'package:habito/constants/app_colors.dart';
 import 'package:habito/features/routines/widgets/input_task.dart';
 
@@ -29,66 +30,87 @@ class _TasksColumnState extends State<TasksColumn> {
         context.watch<AppStateProvider>().isDarkMode(context);
     final buttonBackgroundColor = isDarkMode ? HabiColor.blue : HabiColor.white;
     final selectedDay = context.watch<WeekProvider>().weeksValues.activeDay;
-    List<Task> tasks = context.watch<TaskProvider>().tasks.reversed.toList();
-
-    if (tasks.isEmpty) {
-      context.read<TaskProvider>().uncompleteRoutineByDay(selectedDay.keyDate);
-    }
 
     void newTaskAction() {
       context.read<AppStateProvider>().openKeyboard(inputFocusNode);
     }
 
+    void uncompleteRoutine(String day) {
+      context.read<TaskProvider>().uncompleteRoutineByDay(day);
+    }
+
     return Column(
       children: [
         Expanded(
-          child: FutureBuilder(
-            future: context
-                .read<TaskProvider>()
-                .initRoutineByDay(selectedDay.keyDate),
+          child: StreamBuilder(
+            stream: context.watch<TaskProvider>().streamTasks,
+            // future: context
+            //     .read<TaskProvider>()
+            //     .initRoutineByDay(selectedDay.keyDate),
             builder: (context, snapshot) {
-              if (tasks.isEmpty) {
+              // if (!snapshot.hasData) {
+              //   return const Placeholder();
+              // }
+
+              if (snapshot.data?.state == TaskLoadingState.loading) {
+                return const LoadingPlaceholder();
+              }
+
+              if (snapshot.data?.state == TaskLoadingState.loaded) {
+                final tasks = snapshot.data!.tasksReverse;
+
+                if (tasks.isEmpty) {
+                  uncompleteRoutine(selectedDay.keyDate);
+                }
+
+                if (tasks.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: HabiMeasurements.paddingHorizontal,
+                    ),
+                    child: Column(
+                      children: [
+                        AddTasksButton(
+                          buttonBackgroundColor: buttonBackgroundColor,
+                          newTaskAction: newTaskAction,
+                        ),
+                        Expanded(
+                          child: Visibility(
+                            visible: !context
+                                .watch<AppStateProvider>()
+                                .isKeyboardOpen,
+                            child: const Center(
+                              child: Text("No tasks for today 🥲"),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: HabiMeasurements.paddingHorizontal,
                   ),
-                  child: Column(
-                    children: [
-                      AddTasksButton(
-                          buttonBackgroundColor: buttonBackgroundColor,
-                          newTaskAction: newTaskAction),
-                      Expanded(
-                        child: Visibility(
-                          visible:
-                              !context.watch<AppStateProvider>().isKeyboardOpen,
-                          child: const Center(
-                            child: Text("No tasks for today 🥲"),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: ListView.builder(
+                    // controller: listScrollController,
+                    shrinkWrap: true,
+                    // physics: const NeverScrollableScrollPhysics(),
+                    itemCount: tasks.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return AddTasksButton(
+                            buttonBackgroundColor: buttonBackgroundColor,
+                            newTaskAction: newTaskAction);
+                      }
+                      return TaskListTile(task: tasks[index - 1]);
+                    },
                   ),
                 );
               }
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: HabiMeasurements.paddingHorizontal,
-                ),
-                child: ListView.builder(
-                  // controller: listScrollController,
-                  shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
-                  itemCount: tasks.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return AddTasksButton(
-                          buttonBackgroundColor: buttonBackgroundColor,
-                          newTaskAction: newTaskAction);
-                    }
-                    return TaskListTile(task: tasks[index - 1]);
-                  },
-                ),
-              );
+
+              return const LoadingPlaceholder();
             },
           ),
         ),
@@ -135,11 +157,6 @@ class _AddTasksButtonState extends State<AddTasksButton> {
     if (isTomorrow) {
       canAddTask = true;
     }
-
-    // if (isKeyboardOpen == false) {
-    //   canAddTask = true;
-    // }
-    // print(isTomorrow);
 
     return Container(
       padding: const EdgeInsets.only(

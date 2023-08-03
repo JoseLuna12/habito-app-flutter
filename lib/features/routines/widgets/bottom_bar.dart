@@ -34,7 +34,7 @@ class BottomBar extends StatelessWidget {
 
     return Visibility(
       visible: canComplete && routine != null && !routine.completed,
-      replacement: IncompletedRoutine(
+      replacement: CompleteRoutineBadge(
           completed: routine != null && routine.completed,
           isFuture: isFutureDate),
       child: Container(
@@ -46,8 +46,8 @@ class BottomBar extends StatelessWidget {
   }
 }
 
-class IncompletedRoutine extends StatelessWidget {
-  const IncompletedRoutine(
+class CompleteRoutineBadge extends StatelessWidget {
+  const CompleteRoutineBadge(
       {super.key, required this.completed, required this.isFuture});
 
   final bool completed;
