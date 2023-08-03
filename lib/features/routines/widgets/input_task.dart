@@ -47,8 +47,8 @@ class _InputTaskState extends State<InputTask> {
         ..name = task
         ..time = selectedDay.keyDate
         ..note = _noteInputController.text;
-      context.read<TaskProvider>().addTaskToRoutine(t);
       context.read<AppStateProvider>().resetRecommendations();
+      context.read<TaskProvider>().addTaskToRoutine(t);
       _taskInputController.clear();
       _noteInputController.clear();
     }

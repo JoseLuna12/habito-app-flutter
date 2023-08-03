@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:habito/common/database/isar.dart';
 import 'package:habito/common/models/task_recommendation.isar.dart';
-import 'package:habito/common/providers/task_provider.dart';
-import 'package:habito/common/providers/week_provider.dart';
-import 'package:provider/provider.dart';
 
 class AppStateProvider extends ChangeNotifier {
   FocusNode? _currentInputFocus;
@@ -63,36 +60,32 @@ class AppStateProvider extends ChangeNotifier {
     _currentInputFocus = inputNode;
     _isKeyboardOpen = true;
     inputNode.requestFocus();
-    print("object");
     notifyListeners();
   }
 
-  bool canCompleteRoutine(BuildContext context) {
-    final taskProvider = context.read<TaskProvider>();
-    final weekProvider = context.read<WeekProvider>();
-    final today = weekProvider.weeksValues.today;
-    final activeDay = weekProvider.weeksValues.activeDay;
+  // bool canCompleteRoutine(BuildContext context) {
+  //   final taskProvider = context.read<TaskProvider>();
+  //   final weekProvider = context.read<WeekProvider>();
+  //   final today = weekProvider.weeksValues.today;
+  //   final activeDay = weekProvider.weeksValues.activeDay;
 
-    final tomorrow = today.date..add(const Duration(days: 1));
-    final yesterday = today.date..subtract(const Duration(days: 1));
+  //   final tomorrow = today.date..add(const Duration(days: 1));
+  //   final yesterday = today.date..subtract(const Duration(days: 1));
 
-    bool canComplete = true;
+  //   bool canComplete = true;
 
-    if (today.keyDate == activeDay.keyDate) {
-      print("is today");
-      canComplete = false;
-    }
+  //   if (today.keyDate == activeDay.keyDate) {
+  //     canComplete = false;
+  //   }
 
-    if (activeDay.date == yesterday) {
-      print("is yesterday");
-      canComplete = false;
-    }
+  //   if (activeDay.date == yesterday) {
+  //     canComplete = false;
+  //   }
 
-    if (taskProvider.tasks.isNotEmpty) {
-      print("is not empty");
-      canComplete = false;
-    }
+  //   if (taskProvider.tasks.isNotEmpty) {
+  //     canComplete = false;
+  //   }
 
-    return canComplete;
-  }
+  //   return canComplete;
+  // }
 }

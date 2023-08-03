@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:habito/common/database/isar.dart';
+import 'package:habito/common/models/routine.isar.dart';
 import 'package:habito/common/models/task.isar.dart';
 
 class TaskProvider extends ChangeNotifier {
   List<Task> _tasks = List<Task>.empty(growable: true);
-
+  Routine? _currentRoutine;
   List<Task> get tasks => _tasks;
-
+  Routine? get currentRoutine => _currentRoutine;
   Future<void> initTasks() async {
     final db = IsarDatabase();
     _tasks = await db.getTasks();
@@ -21,8 +22,8 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> initRoutineByDay(String time) async {
     final db = IsarDatabase();
-    final currentRoutine = await db.getRoutineByTime(time: time);
-    final tasksLinks = currentRoutine?.tasks;
+    _currentRoutine = await db.getRoutineByTime(time: time);
+    final tasksLinks = _currentRoutine?.tasks;
     final List<Task> currentTasks = [];
     if (tasksLinks != null) {
       for (var element in tasksLinks) {
@@ -35,7 +36,19 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> completeRoutineByDay(String time) async {
     final db = IsarDatabase();
-    await db.completeRoutine(time);
+    await db.updateRutineByDay(time, true);
+    if (_currentRoutine != null) {
+      _currentRoutine!.completed = true;
+    }
+    notifyListeners();
+  }
+
+  Future<void> uncompleteRoutineByDay(String time) async {
+    final db = IsarDatabase();
+    await db.updateRutineByDay(time, false);
+    if (_currentRoutine != null) {
+      _currentRoutine!.completed = false;
+    }
     notifyListeners();
   }
 

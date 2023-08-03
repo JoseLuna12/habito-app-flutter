@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habito/common/date/day.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
 import 'package:habito/constants/app_colors.dart';
@@ -28,6 +29,11 @@ class _TasksColumnState extends State<TasksColumn> {
         context.watch<AppStateProvider>().isDarkMode(context);
     final buttonBackgroundColor = isDarkMode ? HabiColor.blue : HabiColor.white;
     final selectedDay = context.watch<WeekProvider>().weeksValues.activeDay;
+    List<Task> tasks = context.watch<TaskProvider>().tasks.reversed.toList();
+
+    if (tasks.isEmpty) {
+      context.read<TaskProvider>().uncompleteRoutineByDay(selectedDay.keyDate);
+    }
 
     void newTaskAction() {
       context.read<AppStateProvider>().openKeyboard(inputFocusNode);
@@ -38,12 +44,9 @@ class _TasksColumnState extends State<TasksColumn> {
         Expanded(
           child: FutureBuilder(
             future: context
-                .watch<TaskProvider>()
+                .read<TaskProvider>()
                 .initRoutineByDay(selectedDay.keyDate),
             builder: (context, snapshot) {
-              List<Task> tasks =
-                  context.read<TaskProvider>().tasks.reversed.toList();
-
               if (tasks.isEmpty) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(
@@ -51,11 +54,9 @@ class _TasksColumnState extends State<TasksColumn> {
                   ),
                   child: Column(
                     children: [
-                      addTaskButton(
-                        buttonBackgroundColor,
-                        context,
-                        newTaskAction,
-                      ),
+                      AddTasksButton(
+                          buttonBackgroundColor: buttonBackgroundColor,
+                          newTaskAction: newTaskAction),
                       Expanded(
                         child: Visibility(
                           visible:
@@ -80,11 +81,9 @@ class _TasksColumnState extends State<TasksColumn> {
                   itemCount: tasks.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      return addTaskButton(
-                        buttonBackgroundColor,
-                        context,
-                        newTaskAction,
-                      );
+                      return AddTasksButton(
+                          buttonBackgroundColor: buttonBackgroundColor,
+                          newTaskAction: newTaskAction);
                     }
                     return TaskListTile(task: tasks[index - 1]);
                   },
@@ -97,12 +96,51 @@ class _TasksColumnState extends State<TasksColumn> {
       ],
     );
   }
+}
 
-  Container addTaskButton(
-    Color buttonBackgroundColor,
-    BuildContext context,
-    void Function() newTaskAction,
-  ) {
+class AddTasksButton extends StatefulWidget {
+  const AddTasksButton({
+    super.key,
+    required this.buttonBackgroundColor,
+    required this.newTaskAction,
+  });
+
+  final Color buttonBackgroundColor;
+  final void Function() newTaskAction;
+
+  @override
+  State<AddTasksButton> createState() => _AddTasksButtonState();
+}
+
+class _AddTasksButtonState extends State<AddTasksButton> {
+  @override
+  Widget build(BuildContext context) {
+    // final isKeyboardOpen = context.watch<AppStateProvider>().isKeyboardOpen;
+    final weekProvider = context.watch<WeekProvider>();
+    final today = weekProvider.weeksValues.today;
+    final activeDay = weekProvider.weeksValues.activeDay;
+
+    final tomorrowDate = today.date.add(const Duration(days: 1));
+    final tomorrow = HabiDay(date: tomorrowDate);
+
+    final isToday = activeDay.keyDate == today.keyDate;
+    final isTomorrow = tomorrow.keyDate == activeDay.keyDate;
+
+    bool canAddTask = false;
+
+    if (isToday) {
+      canAddTask = true;
+    }
+
+    if (isTomorrow) {
+      canAddTask = true;
+    }
+
+    // if (isKeyboardOpen == false) {
+    //   canAddTask = true;
+    // }
+    // print(isTomorrow);
+
     return Container(
       padding: const EdgeInsets.only(
         top: 25,
@@ -110,11 +148,9 @@ class _TasksColumnState extends State<TasksColumn> {
         right: HabiMeasurements.paddingHorizontalButtonXl,
         bottom: 30,
       ),
-      color: buttonBackgroundColor,
+      color: widget.buttonBackgroundColor,
       child: ElevatedButton(
-        onPressed: context.watch<AppStateProvider>().isKeyboardOpen
-            ? null
-            : newTaskAction,
+        onPressed: canAddTask ? widget.newTaskAction : null,
         child: const Text("new task"),
       ),
     );

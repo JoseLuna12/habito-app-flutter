@@ -12,12 +12,14 @@ class BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<AppStateProvider>().isDarkMode(context);
+    final routine = context.watch<TaskProvider>().currentRoutine;
 
     final weekProvider = context.watch<WeekProvider>();
     final today = weekProvider.weeksValues.today;
     final activeDay = weekProvider.weeksValues.activeDay;
 
     final yesterdayDate = today.date.subtract(const Duration(days: 1));
+    final isFutureDate = today.date.isBefore(activeDay.date);
     final yesterday = HabiDay(date: yesterdayDate);
 
     bool canComplete = false;
@@ -31,11 +33,71 @@ class BottomBar extends StatelessWidget {
     }
 
     return Visibility(
-      visible: canComplete,
+      visible: canComplete && routine != null && !routine.completed,
+      replacement: IncompletedRoutine(
+          completed: routine != null && routine.completed,
+          isFuture: isFutureDate),
       child: Container(
         color: isDarkMode ? HabiColor.blue : HabiColor.white,
         height: 80,
         child: const Bar(),
+      ),
+    );
+  }
+}
+
+class IncompletedRoutine extends StatelessWidget {
+  const IncompletedRoutine(
+      {super.key, required this.completed, required this.isFuture});
+
+  final bool completed;
+  final bool isFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    Color badgeColor = completed ? Colors.green : HabiColor.dangerLight;
+
+    if (isFuture) {
+      badgeColor = HabiColor.grayDark;
+    }
+
+    final String text = completed ? "Completed" : "Incompleted";
+    final IconData icon = completed
+        ? Icons.check_circle_outline_outlined
+        : Icons.dangerous_outlined;
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: HabiMeasurements.paddingBottomLast - 10,
+        left: HabiMeasurements.paddingHorizontalButtonXl,
+        right: HabiMeasurements.paddingHorizontalButtonXl,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: badgeColor,
+          borderRadius: BorderRadius.circular(HabiMeasurements.cornerRadius),
+        ),
+        width: 250,
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              text,
+              style: const TextStyle(color: HabiColor.white),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Visibility(
+              visible: !isFuture,
+              child: Icon(
+                icon,
+                color: HabiColor.white,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -77,8 +139,7 @@ class _BarState extends State<Bar> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    late final isDarkMode =
-        context.read<AppStateProvider>().isDarkMode(context);
+    final isDarkMode = context.read<AppStateProvider>().isDarkMode(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -88,12 +149,10 @@ class _BarState extends State<Bar> with SingleTickerProviderStateMixin {
         ),
         InkWell(
           onTapDown: (details) {
-            // startTime();
             buttonPressed = true;
             _buttonAnimationController.forward();
           },
           onTapUp: (details) {
-            // stopTIme();
             buttonPressed = false;
             _buttonAnimationController.reset();
           },

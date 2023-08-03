@@ -30,11 +30,11 @@ class IsarDatabase {
         .findAll();
   }
 
-  Future<void> completeRoutine(String time) async {
+  Future<void> updateRutineByDay(String time, bool complete) async {
     final isar = await _isar;
     final routine = await getRoutineByTime(time: time, isarInstance: isar);
     if (routine != null) {
-      routine.completed = true;
+      routine.completed = complete;
       isar.writeTxnSync(() {
         isar.routines.putSync(routine);
       });

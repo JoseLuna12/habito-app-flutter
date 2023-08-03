@@ -5,8 +5,10 @@ import 'package:http/http.dart' as http;
 enum RequestType { post, get, delete, put }
 
 class RequestHabito {
-  final bool _debugLogging = const bool.fromEnvironment('DEBUG_NETWORK_LOGGER');
-  final String _serverUrl = const String.fromEnvironment('SERVER_URL');
+  // final bool _debugLogging = const bool.fromEnvironment('DEBUG_NETWORK_LOGGER') ?? false;
+  // final String? _serverUrl = const String.fromEnvironment('SERVER_URL') ?? "";
+  final bool _debugLogging = false;
+  final String _serverUrl = "";
   late String _url;
   bool _badRequest = false;
   int _status = 200;
