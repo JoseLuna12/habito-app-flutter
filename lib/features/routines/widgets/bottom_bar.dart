@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/date/day.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/task_provider.dart';
@@ -20,6 +21,7 @@ class BottomBar extends StatelessWidget {
 
     final yesterdayDate = today.date.subtract(const Duration(days: 1));
     final isFutureDate = today.date.isBefore(activeDay.date);
+    final isPastDate = today.date.isAfter(activeDay.date);
     final yesterday = HabiDay(date: yesterdayDate);
 
     bool canComplete = false;
@@ -35,8 +37,10 @@ class BottomBar extends StatelessWidget {
     return Visibility(
       visible: canComplete && routine != null && !routine.completed,
       replacement: CompleteRoutineBadge(
-          completed: routine != null && routine.completed,
-          isFuture: isFutureDate),
+        completed: routine != null && routine.completed,
+        isPast: isPastDate,
+        isFuture: isFutureDate,
+      ),
       child: Container(
         color: isDarkMode ? HabiColor.blue : HabiColor.white,
         height: 80,
@@ -48,16 +52,24 @@ class BottomBar extends StatelessWidget {
 
 class CompleteRoutineBadge extends StatelessWidget {
   const CompleteRoutineBadge(
-      {super.key, required this.completed, required this.isFuture});
+      {super.key,
+      required this.completed,
+      required this.isFuture,
+      required this.isPast});
 
   final bool completed;
   final bool isFuture;
+  final bool isPast;
 
   @override
   Widget build(BuildContext context) {
     Color badgeColor = completed ? Colors.green : HabiColor.dangerLight;
 
     if (isFuture) {
+      badgeColor = HabiColor.grayDark;
+    }
+
+    if (isPast && !completed) {
       badgeColor = HabiColor.grayDark;
     }
 
@@ -122,6 +134,7 @@ class _BarState extends State<Bar> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     selectedDay = context.read<WeekProvider>().weeksValues.activeDay;
+
     _buttonAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -133,12 +146,14 @@ class _BarState extends State<Bar> with SingleTickerProviderStateMixin {
 
   void completeRoutine(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
+      HapticFeedback.heavyImpact();
       context.read<TaskProvider>().completeRoutineByDay(selectedDay.keyDate);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isEmpty = context.watch<TaskProvider>().isTaskEmpty;
     final isDarkMode = context.read<AppStateProvider>().isDarkMode(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -148,14 +163,20 @@ class _BarState extends State<Bar> with SingleTickerProviderStateMixin {
           height: 10,
         ),
         InkWell(
-          onTapDown: (details) {
-            buttonPressed = true;
-            _buttonAnimationController.forward();
-          },
-          onTapUp: (details) {
-            buttonPressed = false;
-            _buttonAnimationController.reset();
-          },
+          onTapDown: isEmpty
+              ? null
+              : (details) {
+                  HapticFeedback.selectionClick();
+                  buttonPressed = true;
+                  _buttonAnimationController.forward();
+                },
+          onTapUp: isEmpty
+              ? null
+              : (details) {
+                  HapticFeedback.lightImpact();
+                  buttonPressed = false;
+                  _buttonAnimationController.reset();
+                },
           child: ClipRRect(
             borderRadius: const BorderRadius.all(
               Radius.circular(HabiMeasurements.cornerRadius),
@@ -189,10 +210,10 @@ class _BarState extends State<Bar> with SingleTickerProviderStateMixin {
                         width: (animatedValue * 250).roundToDouble(),
                         height: 50,
                       ),
-                      const Center(
+                      Center(
                         child: Text(
-                          "Complete Routine",
-                          style: TextStyle(color: HabiColor.white),
+                          isEmpty ? "Please add a task" : "Complete Routine",
+                          style: const TextStyle(color: HabiColor.white),
                         ),
                       ),
                     ],

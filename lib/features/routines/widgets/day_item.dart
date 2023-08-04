@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/date/day.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
@@ -35,6 +36,7 @@ class DayListItem extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
+        HapticFeedback.lightImpact();
         context.read<WeekProvider>().selectDay(currDay);
       },
       child: Container(

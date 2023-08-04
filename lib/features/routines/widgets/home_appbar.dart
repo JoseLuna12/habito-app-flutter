@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/user_provider.dart';
 import 'package:habito/constants/app_colors.dart';
@@ -55,8 +56,10 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Visibility(
             visible: !context.watch<AppStateProvider>().isKeyboardOpen,
             replacement: TextButton(
-              onPressed: () => context.read<AppStateProvider>().closeKeyboard(),
-              child: const Text("close"),
+              onPressed: () {
+                context.read<AppStateProvider>().closeKeyboard();
+              },
+              child: const Text("Close"),
             ),
             child: const CircleAvatar(
               backgroundColor: HabiColor.orange,

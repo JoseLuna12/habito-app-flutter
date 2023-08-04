@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/database/isar.dart';
 import 'package:habito/common/models/task_recommendation.isar.dart';
 
@@ -29,6 +30,7 @@ class AppStateProvider extends ChangeNotifier {
     if (_currentInputFocus == null) {
       return;
     }
+    HapticFeedback.selectionClick();
     _currentInputFocus?.unfocus();
     _isKeyboardOpen = false;
     _currentInputFocus = null;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/date/day.dart';
 import 'package:habito/common/models/task.isar.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
@@ -51,6 +52,7 @@ class _InputTaskState extends State<InputTask> {
       context.read<TaskProvider>().addTaskToRoutine(t);
       _taskInputController.clear();
       _noteInputController.clear();
+      HapticFeedback.selectionClick();
     }
 
     Future<void> recommendationAction(String value) async {

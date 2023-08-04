@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/date/day.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
@@ -29,14 +30,10 @@ class _TasksColumnState extends State<TasksColumn> {
     final bool isDarkMode =
         context.watch<AppStateProvider>().isDarkMode(context);
     final buttonBackgroundColor = isDarkMode ? HabiColor.blue : HabiColor.white;
-    final selectedDay = context.watch<WeekProvider>().weeksValues.activeDay;
 
     void newTaskAction() {
+      HapticFeedback.lightImpact();
       context.read<AppStateProvider>().openKeyboard(inputFocusNode);
-    }
-
-    void uncompleteRoutine(String day) {
-      context.read<TaskProvider>().uncompleteRoutineByDay(day);
     }
 
     return Column(
@@ -58,10 +55,6 @@ class _TasksColumnState extends State<TasksColumn> {
 
               if (snapshot.data?.state == TaskLoadingState.loaded) {
                 final tasks = snapshot.data!.tasksReverse;
-
-                if (tasks.isEmpty) {
-                  uncompleteRoutine(selectedDay.keyDate);
-                }
 
                 if (tasks.isEmpty) {
                   return Padding(
@@ -168,7 +161,7 @@ class _AddTasksButtonState extends State<AddTasksButton> {
       color: widget.buttonBackgroundColor,
       child: ElevatedButton(
         onPressed: canAddTask ? widget.newTaskAction : null,
-        child: const Text("new task"),
+        child: const Text("New task"),
       ),
     );
   }
@@ -190,6 +183,7 @@ class _TaskListTileState extends State<TaskListTile> {
   @override
   Widget build(BuildContext context) {
     Future<bool> deleteTask(Task task) async {
+      HapticFeedback.mediumImpact();
       final complete = await context.read<TaskProvider>().removeTask(task);
       return complete;
     }
@@ -202,7 +196,6 @@ class _TaskListTileState extends State<TaskListTile> {
         onDismissed: (direction) {
           deleteTask(widget.task);
         },
-        // confirmDismiss: (direction) => deleteTask(widget.task),
         key: ValueKey(widget.task.localId),
         direction: DismissDirection.endToStart,
         background: Container(

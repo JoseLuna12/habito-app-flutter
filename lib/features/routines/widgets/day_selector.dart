@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:habito/common/date/week.dart';
 import 'package:habito/common/providers/app_state_provider.dart';
 import 'package:habito/common/providers/week_provider.dart';
 import 'package:habito/constants/app_colors.dart';
+import 'package:habito/constants/app_measurements.dart';
 import 'package:habito/features/routines/widgets/day_item.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +25,7 @@ class _DaySelectorState extends State<DaySelector> {
   @override
   void initState() {
     super.initState();
+    // initHabitoVibration();
   }
 
   @override
@@ -37,11 +40,16 @@ class _DaySelectorState extends State<DaySelector> {
         color: backgroundColor,
       ),
       height: 73,
+      // padding:
+      margin: const EdgeInsets.only(
+        bottom: HabiMeasurements.bottomTaskTilePadding,
+      ),
       child: Row(
         children: [
           Expanded(
             child: PageView.builder(
               onPageChanged: (value) {
+                HapticFeedback.mediumImpact();
                 context.read<WeekProvider>().onWeekChange(value);
                 if (value == allWeeks.weeks.length - 1) {
                   context.read<WeekProvider>().addWeekToEnd();

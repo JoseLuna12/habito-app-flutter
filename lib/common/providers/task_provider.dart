@@ -37,6 +37,8 @@ class TaskProvider extends ChangeNotifier {
   Stream<TaskStreamData> get streamTasks => _streamTasks.stream;
   List<Task> get tasks => _tasks;
   Routine? get currentRoutine => _currentRoutine;
+  bool get isTaskEmpty => _tasks.isEmpty;
+
   Future<void> initTasks() async {
     final db = IsarDatabase();
     _tasks = await db.getTasks();
@@ -113,7 +115,7 @@ class TaskProvider extends ChangeNotifier {
     await saveRecommendation(task.name, db);
     _tasks.add(task);
     _streamTasks.add(TaskStreamData()..streamLoaded(tasks));
-    // notifyListeners();
+    notifyListeners();
   }
 
   Future<void> addTask(Task task) async {
@@ -132,6 +134,9 @@ class TaskProvider extends ChangeNotifier {
     try {
       await db.deleteTask(task.localId);
       _tasks = _tasks.where((t) => t.localId != task.localId).toList();
+      if (_tasks.isEmpty && task.time != null) {
+        uncompleteRoutineByDay(task.time ?? "");
+      }
       streamData.streamLoaded(_tasks);
       _streamTasks.add(streamData);
       // notifyListeners();
